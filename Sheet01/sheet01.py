@@ -99,23 +99,37 @@ def read_data_cls(split):
     Y = np.concatenate((gt['bottle'], gt['horse']), axis=0)
     return Y, X
 
+#takes features with bias X (num_samples*(1+num_features)), and current_parameters w (num_features+1)
+#Returns the predicted value of label
+def predict(X, w):
+    Z = np.matmul(X, w)
+    Y_output = 1.0 / (1.0 + np.exp(-Z))
+    return Y_output
+
 # takes features with bias X (num_samples*(1+num_features)), gt Y (num_samples) and current_parameters w (num_features+1)
 # Y must be from {-1, 1}
 # returns gradient with respect to w (num_features)
 def log_llkhd_grad(X, Y, w):
-    pass
+    Y_output = predict(X,w)
+    grad_weight = np.matmul(X.T, Y_output-(Y+1)/2)
+    return grad_weight
 
 #takes features with bias X (num_samples*(1+num_features)), gt Y (num_samples) and current_parameters w (num_features+1)
 # Y must be from {-1, 1}
 #returns log likelihood loss
 def get_loss(X, Y, w):
-    pass
+    Y_output  = predict(X, w)
+    loss = -(np.dot((Y.T+1)/2, np.log(Y_output)) + np.dot(1 - (Y.T+1)/2, np.log(1 - Y_output)))
+    return loss
 
 #takes features with bias X (num_samples*(1+num_features)), gt Y (num_samples) and current_parameters w (num_features+1)
 # Y must be from {-1, 1}
 #returns accuracy
 def get_accuracy(X, Y, w):
-    pass
+    Y_output = predict(X, w)
+    Y_output[Y_output >= 0.5] = 1
+    Y_output[Y_output < 0.5] = -1
+    return np.count_nonzero(Y_output == Y) / len(Y)
 
 ####################################################################################################################################
 #Classification
@@ -123,11 +137,18 @@ def get_accuracy(X, Y, w):
 def run_classification(X_tr, Y_tr, X_te, Y_te, step_size):
     print('classification with step size '+str(step_size))
     max_iter = 10000
+    W = np.random.uniform(0, 1, size=(X_tr.shape[1]))
     for step in range(max_iter):
-        if step%1000 == 0:
-            print('step='+str(step)+' loss='+str(loss)+' accuracy='+str(accuracy))
 
-    print('test set loss='+str(loss)+' accuracy='+str(accuracy))
+        grad_weight = log_llkhd_grad(X_tr, Y_tr, W)
+        W = W - step_size * grad_weight
+        if step%1000 == 0:
+            loss = get_loss(X_tr, Y_tr, W)
+            accuracy = get_accuracy(X_tr, Y_tr, W)
+            print('step='+str(step)+' loss='+str(loss)+' accuracy='+str(accuracy))
+    test_set_loss = get_loss(X_te, Y_te, W)
+    accuracy = get_accuracy(X_te, Y_te, W)
+    print('test set loss='+str(test_set_loss)+' accuracy='+str(accuracy))
 
 
 ####################################################################################################################################
@@ -144,7 +165,7 @@ val_list = list(range(int(X_tr.shape[0]/2), X_tr.shape[0]))
 # run_dual_reg(X_tr, Y_tr, X_te, Y_te, tr_list, val_list)
 run_non_lin_reg(X_tr, Y_tr, X_te, Y_te, tr_list, val_list)
 
-step_size = 0.0001
+step_size = 0.01
 Y_tr, X_tr = read_data_cls('test')
 Y_te, X_te = read_data_cls('test')
 run_classification(X_tr, Y_tr, X_te, Y_te, step_size)
