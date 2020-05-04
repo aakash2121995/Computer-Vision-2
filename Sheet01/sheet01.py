@@ -142,9 +142,10 @@ def read_data_cls(split):
 
 #takes features with bias X (num_samples*(1+num_features)), and current_parameters w (num_features+1)
 #Returns the predicted value of label
+epsilon = 1e-4
 def predict(X, w):
     Z = np.matmul(X, w)
-    Y_output = 1.0 / (1.0 + np.exp(-Z))
+    Y_output = 1.0 / ((1.0 + np.exp(-Z ))+ epsilon)
     return Y_output
 
 # takes features with bias X (num_samples*(1+num_features)), gt Y (num_samples) and current_parameters w (num_features+1)
@@ -153,6 +154,7 @@ def predict(X, w):
 def log_llkhd_grad(X, Y, w):
     Y_output = predict(X,w)
     grad_weight = np.matmul(X.T, Y_output-(Y+1)/2)
+
     return grad_weight
 
 #takes features with bias X (num_samples*(1+num_features)), gt Y (num_samples) and current_parameters w (num_features+1)
@@ -168,9 +170,13 @@ def get_loss(X, Y, w):
 #returns accuracy
 def get_accuracy(X, Y, w):
     Y_output = predict(X, w)
-    Y_output[Y_output >= 0.5] = 1
-    Y_output[Y_output < 0.5] = -1
-    return np.count_nonzero(Y_output == Y) / len(Y)
+    predicted = []
+    for i in range(len(Y)):
+        if Y_output[i] > 0.5:
+            predicted.append(1)
+        else:
+            predicted.append(-1)
+    return np.count_nonzero(predicted == Y) / len(Y)
 
 ####################################################################################################################################
 #Classification
@@ -206,7 +212,9 @@ val_list = list(range(int(X_tr.shape[0]/2), X_tr.shape[0]))
 run_dual_reg(X_tr, Y_tr, X_te, Y_te, tr_list, val_list)
 run_non_lin_reg(X_tr, Y_tr, X_te, Y_te, tr_list, val_list)
 
-step_size = 0.01
-Y_tr, X_tr = read_data_cls('test')
+step_size = 0.1
+Y_tr, X_tr = read_data_cls('train')
 Y_te, X_te = read_data_cls('test')
 run_classification(X_tr, Y_tr, X_te, Y_te, step_size)
+
+# The model gets stuck in local minima as the learning rate is low.
