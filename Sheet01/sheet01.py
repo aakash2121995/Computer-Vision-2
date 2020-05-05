@@ -218,5 +218,5 @@ Y_te, X_te = read_data_cls('test')
 run_classification(X_tr, Y_tr, X_te, Y_te, step_size)
 
 #Solution 2.1(Theory)
-# The model got stuck in local minima beacause of low learning rate, as a too low learning rate will either take too
+# The model got stuck in local minima because of low learning rate, as a too low learning rate will either take too
 # long to converge or get stuck in an undesirable local minimum.
