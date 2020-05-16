@@ -19,7 +19,7 @@ class PatchSampler():
             img = cv2.imread("images/"+im)
             img_seg = cv2.imread("images/"+im_seg)
 
-            for index in range(5000):
+            for index in range(100000):
                 i = np.random.randint(0,img_seg.shape[0]-self.patchsize)
                 j = np.random.randint(0,img_seg.shape[1]-self.patchsize)
                 patch = img_seg[ i:i+self.patchsize, j:j+self.patchsize]
@@ -29,7 +29,7 @@ class PatchSampler():
         min_patch = min(len(patches[0]),len(patches[1]),len(patches[2]) ,len(patches[3]))
         patches = patches[0][:min_patch]+ patches[1][:min_patch]+ patches[2][:min_patch] + patches[3][:min_patch]
         labels = [0 for i in range(min_patch)]+ [1 for i in range(min_patch)] + [2 for i in range(min_patch)] + [3 for i in range(min_patch)]
-        return patches, labels
+        return np.stack(patches), np.array(labels)
     # feel free to add any helper functions
 
 

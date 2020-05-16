@@ -70,7 +70,7 @@ class DecisionTree():
     def compute_entropy(self, labels):
         class_, count = np.unique(labels, return_counts=True)
         probs = count/count.sum()
-        log_prob = np.log(count)
+        log_prob = np.log(probs)
         return -np.dot(log_prob,probs)
 
     # Function to measure information gain for a given split
@@ -92,22 +92,22 @@ class DecisionTree():
                 pixel_location = self.generate_random_pixel_location()
                 for t in range(self.no_of_thresholds):
                     threshhold = 255 * np.random.rand()
-
-                feature = self.get_feature(channel,pixel_location,threshhold)
-                responses = self.getFeatureResponse(patches,feature)
-                left_ids,right_ids = self.getsplit(responses,feature['th'])
-                left = labels[left_ids]
-                right = labels[right_ids]
-                entropy_left = self.compute_entropy(left)
-                entropy_right = self.compute_entropy(right)
-                Nleft, Nright = left.shape[0],left.shape[1]
-                gain = self.get_information_gain(entropy_left,entropy_right,entropy_all, Nall,Nleft, Nright)
-                if gain > best_gain:
-                    best_gain = gain
-                    best_feature = feature
-
+                    feature = self.get_feature(pixel_location,channel,threshhold)
+                    responses = self.getFeatureResponse(patches,feature)
+                    left_ids,right_ids = self.getsplit(responses,feature['th'])
+                    left = labels[left_ids]
+                    right = labels[right_ids]
+                    entropy_left = self.compute_entropy(left)
+                    entropy_right = self.compute_entropy(right)
+                    Nleft, Nright = left.shape[0],right.shape[0]
+                    gain = self.get_information_gain(entropy_left,entropy_right,entropy_all, Nall,Nleft, Nright)
+                    print(gain)
+                    if gain > best_gain:
+                        best_gain = gain
+                        best_feature = feature
+        print(best_feature)
         responses = self.getFeatureResponse(patches, best_feature)
-        left,right = self.getsplit(responses, feature['th'])
+        left,right = self.getsplit(responses, best_feature['th'])
         return left,right,best_feature
 
 
@@ -116,15 +116,14 @@ class DecisionTree():
         return  {'color': channel, 'pixel_location': pixel_loc, 'th': threshhold}
 
     def build_tree(self,patches,labels,depth=0):
-        if depth >= self.depth:
-            return None
+        print(patches.shape[0],labels.shape[0],depth)
         left_id, right_id,feature = self.best_split(patches,labels)
         left_patches, left_labels = patches[left_id], labels[left_id]
         right_patches, right_labels = patches[right_id], labels[right_id]
         node = Node()
 
         if depth == self.depth - 1 or left_patches.shape[0] < self.minimum_patches_at_leaf or right_patches.shape[0] < self.minimum_patches_at_leaf:
-            node.create_leafNode(patches,self.classes)
+            node.create_leafNode(labels,self.classes)
             self.nodes.append(node)
             return node
         else:

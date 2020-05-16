@@ -60,9 +60,9 @@ def run_dual_reg(X_tr, Y_tr, X_te, Y_te, tr_list, val_list):
 
         # Kernel Embeddings and regression
         X_T_X_ = RBF_embed(X_train,X_train,sigma)
-        w = lin_reg(X_T_X_, Y_train)
+        w = lin_reg(X_T_X_, Y_train) # psi computation
         X_T_X_val = RBF_embed(X_val,X_train, sigma)
-        err_dual = test_lin_reg(X_T_X_val, Y_val, w)
+        err_dual = test_lin_reg(X_T_X_val, Y_val, w) 
 
         # Validation Error
         print('MSE/Var dual regression for val sigma='+str(sigma))
