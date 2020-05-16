@@ -19,7 +19,7 @@ class PatchSampler():
             img = cv2.imread("images/"+im)
             img_seg = cv2.imread("images/"+im_seg)
 
-            for index in range(100000):
+            for index in range(50000):
                 i = np.random.randint(0,img_seg.shape[0]-self.patchsize)
                 j = np.random.randint(0,img_seg.shape[1]-self.patchsize)
                 patch = img_seg[ i:i+self.patchsize, j:j+self.patchsize]

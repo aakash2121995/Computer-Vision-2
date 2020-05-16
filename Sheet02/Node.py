@@ -15,8 +15,8 @@ class Node():
     # provide your implementation
     def create_SplitNode(self, leftchild, rightchild, feature):
         self.type = 'SPLIT'
-        self.leftchild = leftchild
-        self.rightchild = rightchild
+        self.leftChild = leftchild
+        self.rightChild = rightchild
         self.feature = feature
 
     # Function to create a new leaf node
@@ -26,10 +26,9 @@ class Node():
         self.type = 'LEAF'
         class_, count = np.unique(labels, return_counts=True)
 
-        cls_to_index = {cls:i for i,cls in enumerate(classes)}
-
-        for cls,count in zip(class_, count):
-            self.probabilities[cls_to_index[cls]] = count
+        # cls_to_index = {cls:i for i,cls in enumerate(classes)}
+        for cls,c in zip(class_, count):
+            self.probabilities[cls] = c
 
         self.probabilities /= count.sum()
 

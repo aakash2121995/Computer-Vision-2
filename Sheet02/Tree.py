@@ -33,9 +33,9 @@ class DecisionTree():
                 patch = I[i:i+patch_size, j:j+patch_size]
                 while node.type == 'SPLIT':
                     feature = node.feature
-                    i,j = feature['pixel_location'][0], feature['pixel_location'][1]
+                    x,y = feature['pixel_location'][0], feature['pixel_location'][1]
                     channel = feature['color']
-                    if patch[i,j,channel] < feature['th']:
+                    if patch[x,y,channel] < feature['th']:
                         node = node.leftChild
                     else:
                         node = node.rightChild
@@ -82,7 +82,7 @@ class DecisionTree():
     # provide your implementation
     # should return left,right split, color, pixel location and threshold
     def best_split(self, patches, labels):
-        best_gain = 0
+        best_gain = -1
         best_feature = None
         entropy_all = self.compute_entropy(labels)
         Nall = patches.shape[0]
@@ -101,7 +101,8 @@ class DecisionTree():
                     entropy_right = self.compute_entropy(right)
                     Nleft, Nright = left.shape[0],right.shape[0]
                     gain = self.get_information_gain(entropy_left,entropy_right,entropy_all, Nall,Nleft, Nright)
-                    print(gain)
+                    if gain < 0:
+                        print('fucl')
                     if gain > best_gain:
                         best_gain = gain
                         best_feature = feature
