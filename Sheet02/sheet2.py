@@ -49,8 +49,9 @@ def main():
         img = cv2.imread("images/" + im)
         img_seg = cv2.imread("images/" + im_seg)
         op = tree.predict(img)
-        display_image(f'Predicted Labels for{im}',op)
-        display_image(f'Actual Labels for{im}',img_seg)
+        display_image(f'Actual Image',img)
+        display_image(f'Predicted Labels for {im}',op/4)
+        display_image(f'Actual Labels for {im}',img_seg[:,:,0]/4)
         # print((op==img_seg).sum()/(op.shape[0]*op.shape[1]))
 
     print('tree')
