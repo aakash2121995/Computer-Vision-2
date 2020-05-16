@@ -22,7 +22,7 @@ def main():
     sampler = PatchSampler(train_images_list, gt_segmentation_maps_list, classes_colors, patchsize)
     patches, labels = sampler.extractpatches()
 
-    tree_params = {'depth':15,'pixel_locations':100, 'random_color_values':10,'no_of_thresholds':50,'minimum_patches_at_leaf':20}
+    tree_params = {'depth':15,'pixel_locations':100, 'random_color_values':10,'no_of_thresholds':50,'minimum_patches_at_leaf':20,'classes':[0,1,2,3]}
     tree = DecisionTree(patches,labels,tree_params)
 
 

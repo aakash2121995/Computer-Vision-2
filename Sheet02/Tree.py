@@ -124,8 +124,8 @@ class DecisionTree():
         node = Node()
 
         if depth == self.depth - 1 or left_patches.shape[0] < self.minimum_patches_at_leaf or right_patches.shape[0] < self.minimum_patches_at_leaf:
-            node.create_leafNode(patches,labels)
-            self.nodes.append((node))
+            node.create_leafNode(patches,self.classes)
+            self.nodes.append(node)
             return node
         else:
             left = self.build_tree(left_patches,left_labels,depth+1)
