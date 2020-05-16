@@ -25,7 +25,6 @@ def main():
     tree_params = {'depth':15,'pixel_locations':100, 'random_color_values':10,'no_of_thresholds':50,'minimum_patches_at_leaf':20,'classes':[0,1,2,3]}
     tree = DecisionTree(patches,labels,tree_params)
 
-
 if __name__ == "__main__":
     main()
 # provide your implementation for the sheet 2 here

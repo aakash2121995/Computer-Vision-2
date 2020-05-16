@@ -20,8 +20,8 @@ class PatchSampler():
             img_seg = cv2.imread("images/"+im_seg)
 
             for index in range(5000):
-                i = np.random.randint(0,img_seg.shape[0])
-                j = np.random.randint(0,img_seg.shape[1])
+                i = np.random.randint(0,img_seg.shape[0]-self.patchsize)
+                j = np.random.randint(0,img_seg.shape[1]-self.patchsize)
                 patch = img_seg[ i:i+self.patchsize, j:j+self.patchsize]
                 for num in self.class_colors:
                     if np.all(patch==num):
