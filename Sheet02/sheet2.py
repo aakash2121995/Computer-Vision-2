@@ -63,6 +63,22 @@ def main():
         display_image(f'Predicted Labels for {im}', get_coloured_imgs(op))
         display_image(f'Actual Labels for {im}', get_coloured_imgs(img_seg[:, :, 0]))
 
+    #Comparing tree and forest results for img_12.bmp
+    im = "img_12.bmp"
+    im_seg = "img_12_segMap.bmp"
+    img = cv2.imread("images/" + im)
+    img_seg = cv2.imread("images/" + im_seg)
+
+    op = tree.predict(img)
+    display_image(f'Tree: Predicted Labels for {im}', get_coloured_imgs(op))
+    display_image(f'Tree: Actual Labels for {im}', get_coloured_imgs(img_seg[:, :, 0]))
+
+    forest = Forest(patches, labels, tree_params, 5)
+    forest.create_forest()
+    op_forest = forest.test(img)
+    display_image(f'Forest: Predicted Labels for {im}', get_coloured_imgs(op_forest))
+    display_image(f'Forest: Actual Labels for {im}', get_coloured_imgs(img_seg[:, :, 0]))
+
 if __name__ == "__main__":
     main()
 # provide your implementation for the sheet 2 here

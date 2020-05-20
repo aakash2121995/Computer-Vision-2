@@ -16,12 +16,14 @@ class Forest():
     # provide your implementation
     # Should return a trained forest with n_trees
     def create_forest(self):
-        pass
+        for tree in (self.trees):
+            root = tree.build_tree(self.patches, self.labels)
+            tree.nodes.append(root)
 
     # Function to apply the trained Random Forest on a test image
     # provide your implementation
     # should return class for every pixel in the test image
     def test(self, I):
-        pass
+        return np.mean([t.predict(I) for t in self.trees], axis=0)
 
     # feel free to add any helper functions
