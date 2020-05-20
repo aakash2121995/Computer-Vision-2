@@ -34,14 +34,24 @@ with open('images/test_images.txt', 'r') as f:
 
 # train_images_list =
 # gt_segmentation_maps_list
-classes_colors = [0, 1, 2, 3]
+classes_colors = [[0,0,0], [0,0,255],[255,0,0],[0,255,0]]
 patchsize = 16
 
+def get_coloured_imgs(img):
+    colored_op = np.zeros((img.shape[0], img.shape[1], 3))
+    for cls, color in enumerate(classes_colors):
+        colored_op[np.where(img == cls)] = color
+
+    return colored_op
+
 def main():
-    sampler = PatchSampler(train_images_list, gt_segmentation_maps_list, classes_colors, patchsize)
+    sampler = PatchSampler(train_images_list, gt_segmentation_maps_list, [0,1,2,3], patchsize)
     patches, labels = sampler.extractpatches()
 
-    tree_params = {'depth':15,'pixel_locations':100, 'random_color_values':10,'no_of_thresholds':50,'minimum_patches_at_leaf':20,'classes':[0,1,2,3]}
+    tree_params = {'depth':15,'pixel_locations':100,
+                   'random_color_values':10,'no_of_thresholds':50,
+                   'minimum_patches_at_leaf':20,'classes':[0,1,2,3]}
+
     tree = DecisionTree(patches,labels,tree_params)
     tree.train()
 
@@ -49,12 +59,9 @@ def main():
         img = cv2.imread("images/" + im)
         img_seg = cv2.imread("images/" + im_seg)
         op = tree.predict(img)
-        display_image(f'Actual Image',img)
-        display_image(f'Predicted Labels for {im}',op/4)
-        display_image(f'Actual Labels for {im}',img_seg[:,:,0]/4)
-        # print((op==img_seg).sum()/(op.shape[0]*op.shape[1]))
-
-    print('tree')
+        display_image(f'Input Image',img)
+        display_image(f'Predicted Labels for {im}', get_coloured_imgs(op))
+        display_image(f'Actual Labels for {im}', get_coloured_imgs(img_seg[:, :, 0]))
 
 if __name__ == "__main__":
     main()

@@ -19,12 +19,13 @@ class PatchSampler():
             img = cv2.imread("images/"+im)
             img_seg = cv2.imread("images/"+im_seg)
 
-            for index in range(500):
+
+            for index in range(2000):
                 i = np.random.randint(0,img_seg.shape[0]-self.patchsize)
                 j = np.random.randint(0,img_seg.shape[1]-self.patchsize)
                 patch = img_seg[ i:i+self.patchsize, j:j+self.patchsize]
                 for num in self.class_colors:
-                    if (patch[7][7][1] == num):
+                    if (patch[7,7,1] == num):
                         patches[num].append(img[ i:i+self.patchsize, j:j+self.patchsize])
         min_patch = min(len(patches[0]),len(patches[1]),len(patches[2]) ,len(patches[3]))
         patches = patches[0][:min_patch]+ patches[1][:min_patch]+ patches[2][:min_patch] + patches[3][:min_patch]

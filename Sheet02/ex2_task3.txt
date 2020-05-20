@@ -1,0 +1,6 @@
+
+Splitting function uses a single value out of 16X16X3 patch at every node for making a decision. 
+This single value does not give a good picture of what is present in the patch. It could be some noise as well.
+Appropriate Splitting function can improve the results.
+
+Also Test Set has some bright images, which would make it difficult to choose a proper threshold. Mean normalisation can assist in this issue.

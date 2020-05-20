@@ -18,8 +18,11 @@ class DecisionTree():
     # provide your implementation
     # should return a trained tree with provided tree param
     def train(self):
+
+        print('Bulding Tree ...')
         root = self.build_tree(self.patches,self.labels)
         self.nodes.append(root)
+        print('Tree is ready!!')
 
     # Function to predict probabilities for single image
     # provide your implementation
@@ -101,12 +104,9 @@ class DecisionTree():
                     entropy_right = self.compute_entropy(right)
                     Nleft, Nright = left.shape[0],right.shape[0]
                     gain = self.get_information_gain(entropy_left,entropy_right,entropy_all, Nall,Nleft, Nright)
-                    if gain < 0:
-                        print('fucl')
                     if gain > best_gain:
                         best_gain = gain
                         best_feature = feature
-        print(best_feature)
         responses = self.getFeatureResponse(patches, best_feature)
         left,right = self.getsplit(responses, best_feature['th'])
         return left,right,best_feature
@@ -117,13 +117,12 @@ class DecisionTree():
         return  {'color': channel, 'pixel_location': pixel_loc, 'th': threshhold}
 
     def build_tree(self,patches,labels,depth=0):
-        print(patches.shape[0],labels.shape[0],depth)
         left_id, right_id,feature = self.best_split(patches,labels)
         left_patches, left_labels = patches[left_id], labels[left_id]
         right_patches, right_labels = patches[right_id], labels[right_id]
         node = Node()
 
-        if depth == self.depth - 1 or left_patches.shape[0] < self.minimum_patches_at_leaf or right_patches.shape[0] < self.minimum_patches_at_leaf:
+        if depth == self.depth  or left_patches.shape[0] < self.minimum_patches_at_leaf or right_patches.shape[0] < self.minimum_patches_at_leaf:
             node.create_leafNode(labels,self.classes)
             self.nodes.append(node)
             return node

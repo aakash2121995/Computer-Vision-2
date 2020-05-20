@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import inv
+from torchtext import datasets,data,vocab
 
 ##############################################################################################################
 #Auxiliary functions for Regression
