@@ -74,6 +74,7 @@ def task2():
     train_data = []
     labels = []
     hog = cv.HOGDescriptor()
+
     with open(filelist_train_pos) as f:
         for path in f.readlines():
             img = cv.imread(path_train_2 + 'pos/' + path.strip())
@@ -115,21 +116,57 @@ def task3():
     print('Task 3 - Train SVM and predict confidence values')
       #TODO Create 3 SVMs with different C values, train them with the training data and save them
       # then use them to classify the test images and save the results
-    print('Loading Data ..')
+    print('Loading Training Data ..')
     trainingData = np.load(train_hog_path)
-    labels = np.load(train_labels)
-
-    for C in [0.01,1,100]:
-        svm = cv.ml.SVM_create()
-        svm.setType(cv.ml.SVM_C_SVC)
-        svm.setKernel(cv.ml.SVM_LINEAR)
-        svm.setC(1)
-        svm.setTermCriteria((cv.TERM_CRITERIA_MAX_ITER, 100, 1e-6))
-        svm.train(trainingData, cv.ml.ROW_SAMPLE, labels)
-        svm.save(f'SVM_{C}_.dat')
+    tr_labels = np.load(train_labels)
 
     filelist_testPos = path_test_2 + 'filenamesTestPos.txt'
     filelist_testNeg = path_test_2 + 'filenamesTestNeg.txt'
+
+    hog = cv.HOGDescriptor()
+    test_data = []
+    tst_labels = []
+
+    print('Loading Test Data ..')
+
+    with open(filelist_testPos) as f:
+        for path in f.readlines():
+            img = cv.imread(path_test_2 + 'pos/' + path.strip())
+            center = img.shape[0]//2,img.shape[1]//2
+            img = img[center[0] - height//2:center[0] + height//2,center[1] - width//2:center[1] + width//2 ]
+            descriptor = hog.compute(img)
+            test_data.append(descriptor.squeeze())
+            tst_labels.append(1)
+
+    with open(filelist_testNeg) as f:
+        for path in f.readlines():
+            img = cv.imread(path_test_2 + 'neg/' + path.strip())
+            for y in range(0,img.shape[0]-height,height):
+                for x in range(0,img.shape[1]-width,width):
+                    patch = img[y:y+height,x:x+width]
+                    descriptor = hog.compute(patch)
+                    test_data.append(descriptor.squeeze())
+                    tst_labels.append(0)
+    test_data = np.stack(test_data)
+    tst_labels = np.array(tst_labels)
+
+    for C in [0.01,1,100]:
+        print(f'Training Model C = {C}')
+        svm = cv.ml.SVM_create()
+        svm.setType(cv.ml.SVM_C_SVC)
+        svm.setKernel(cv.ml.SVM_LINEAR)
+        svm.setC(C)
+        svm.setTermCriteria((cv.TERM_CRITERIA_MAX_ITER, 100, 1e-6))
+        svm.train(trainingData, cv.ml.ROW_SAMPLE, tr_labels)
+        confidence_score = svm.predict(test_data,svm.predict(test_data)[1],cv.ml.StatModel_RAW_OUTPUT)
+
+        print(f'Saving Model and confidence scores and test labels for C = {C}')
+        np.save(f'confidence_{C}.npy',confidence_score[1])
+        svm.save(f'SVM_{C}_.dat')
+
+    print('Saving Test Labels ..')
+    np.save('test_labels.npy',tst_labels)
+
 
 
 
