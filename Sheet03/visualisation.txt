@@ -1,0 +1,4 @@
+We see the trade off between the precision and recall by changing the thresholds.
+
+Also, we see high sensitivity of threshold, in the precison-recall trade off with C=0.01. 
+This means confidence or margin is less when C is small, while it is higher and other cases.
