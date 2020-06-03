@@ -3,7 +3,6 @@ import numpy as np
 import random
 from custom_hog_detector import CustomHogDetector
 import matplotlib.pyplot as plt
-import seaborn as sns
 # Global constants
 
 # crop/patch dimensions for the training samples
@@ -200,15 +199,12 @@ def task4():
     ##task 4
     tst_labels = np.load('test_labels.npy')
     print("Task 4 - Precision-recall plot")
-
     precision = []
     recall = []
-    hue = []
     for C in [0.01,1,100]:
-
         confidence_score = np.load(f'confidence_{C}.npy')
-        # for range between -0.5 to 0.5
-        for threshold in np.random.rand(15)-0.5:
+        # for range between -1 to 1
+        for threshold in np.random.rand(10)-0.5:
             classes = (confidence_score < threshold)*1
             tp = ((classes == tst_labels) & (classes == 1) ).sum()
             fp = ((classes != tst_labels) & (tst_labels == 1)).sum()
@@ -216,12 +212,11 @@ def task4():
 
             recall.append(tp/(tp + fp))
             precision.append(tp/(tp+fn))
-            hue.append(f'C={C}')
 
-    sns.scatterplot(x=recall, y=precision, hue=hue)
+    plt.scatter(recall, precision)
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.title(f'Recall-accuracy graph')
+    plt.title('Recall-accuracy graph')
     plt.show()
 
 
@@ -229,16 +224,16 @@ def task4():
 if __name__ == "__main__":
 
     # Task 1 - OpenCV HOG
-    task1()
-    # #
-    # # Task 2 - Extract HOG Features
-    task2()
+    # task1()
     #
-    # # Task 3 - Train SVM
-    task3()
+    # # Task 2 - Extract HOG Features
+    # task2()
+
+    # Task 3 - Train SVM
+    # task3()
 
     task4()
     #
-    # Task 5 - Multiple Detections
-    task5()
+    # # Task 5 - Multiple Detections
+    # task5()
 
