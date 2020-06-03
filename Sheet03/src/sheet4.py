@@ -1,8 +1,8 @@
 import cv2 as cv
 import numpy as np
 import random
-
-from custom_hog_detector import CustomHogDetector
+from src.custom_hog_detector import CustomHogDetector
+import matplotlib.pyplot as plt
 # Global constants
 
 # crop/patch dimensions for the training samples
@@ -16,8 +16,8 @@ my_svm_filename = '../my_pretrained_svm.dat' # the file to which you save the tr
 
 #data paths
 test_images_1 = '../data/task_1_testImages/'
-path_train_2 = '../data/task_2_3_Data/train/'
-path_test_2 = '../data/task_2_3_Data/test/'
+path_train_2 = '../data/task_2_3_data/train/'
+path_test_2 = '../data/task_2_3_data/test/'
 
 #***********************************************************************************
 # draw a bounding box in a given image
@@ -107,11 +107,6 @@ def task2():
     # save them and their labels in the path train_hog_path and train_labels in order to load them in section 3
 
 
-
-
-
-
-
 def task3():
     print('Task 3 - Train SVM and predict confidence values')
       #TODO Create 3 SVMs with different C values, train them with the training data and save them
@@ -167,9 +162,33 @@ def task3():
     print('Saving Test Labels ..')
     np.save('test_labels.npy',tst_labels)
 
+    ##task 4
+    from sklearn import svm
+    from sklearn import metrics
+    print("Task 4 - Precision-recall plot")
+    precision = []
+    recall = []
+    for c in [2, 5, 10, 50]:
+        # Create a svm Classifier
 
+        clf = svm.SVC(C=c, kernel='rbf')
+        # Train the model using the training sets
+        clf.fit(trainingData, tr_labels)
 
+        # Predict the response for test dataset
+        y_pred = clf.predict(test_data)
 
+        # Model Precision: what percentage of positive tuples are labeled as such?
+        precision.append(metrics.precision_score(tst_labels, y_pred))
+
+        # Model Recall: what percentage of positive tuples are labelled as such?
+        recall.append(metrics.recall_score(tst_labels, y_pred))
+
+    plt.plot(recall, precision)
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Recall-accuracy graph')
+    plt.show()
 
 
 def task5():
@@ -180,17 +199,27 @@ def task5():
     # TODO: Write your own custom class myHogDetector
     # Note: compared with the previous tasks, this task requires more coding
 
-    my_detector = CustomHogDetector(my_svm_filename)
+    my_detector = CustomHogDetector('../src/SVM_0.01_.dat')
+    test_images_1 = '../data/task_1_testImages/'
+    filelist = test_images_1 + 'filenames.txt'
+
+    test_img = []
+    imgs = []
+    with open(filelist) as f:
+        for path in f.readlines():
+            imgs.append(path.strip())
+            test_img.append(cv.imread(test_images_1 + path.strip()))
 
     # TODO Apply your HOG detector on the same test images as used in task 1 and display the results
+    my_detector.detector(test_img, imgs, False)
 
+    # Applying HOG detector again to show opencv HOGDescriptor combined with a sliding window and detection at multiple scales
+    img = 'TestImage01.png'
+    image  = cv.imread(test_images_1+img)
+    my_detector.detector([image], [img], True)
     print('Done!')
     cv.waitKey()
     cv.destroyAllWindows()
-
-
-
-
 
 
 if __name__ == "__main__":
@@ -205,5 +234,5 @@ if __name__ == "__main__":
     task3()
     #
     # # Task 5 - Multiple Detections
-    # task5()
+    task5()
 
