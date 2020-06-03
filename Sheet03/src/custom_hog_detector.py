@@ -4,7 +4,6 @@
     # - perform detection at multiple scales, i.e. you need to scale the extracted patches when performing the detection
     # - non maximum suppression: eliminate detections using non-maximum-suppression based on the overlap area
 import numpy as np
-import imutils
 import time
 import cv2 as cv
 # from src.sheet4 import drawBoundingBox
@@ -48,7 +47,6 @@ class CustomHogDetector:
         i=0
         for score in (scores):
             if abs(score) > 0.0:
-                # x1 = boxes[:, 0]
                 x1 = np.append(x1,boxes[i][0])
                 y1 = np.append(y1,boxes[i][1])
                 x2 = np.append(x2,boxes[i][2] + x1[i])
@@ -92,7 +90,8 @@ class CustomHogDetector:
         while True:
             # compute the new dimensions of the image and resize it
             w = int(image.shape[1] / scale)
-            image = imutils.resize(image, width=w)
+            h = int(image.shape[0] / scale)
+            image = cv.resize(image,(w,h))
             # if the resized image does not meet the supplied minimum
             # size, then stop constructing the pyramid
             if image.shape[0] < minSize[1] or image.shape[1] < minSize[0]:
